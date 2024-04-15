@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 login_url = "https://passport.damai.cn/login?ru=https%3A%2F%2Fwww.damai.cn%2F"
 damai_url = "https://www.damai.cn/"
-ticket_url = "https://detail.damai.cn/item.htm?spm=a2oeg.home.searchtxt.ditem_0.591b23e15Hyzkn&id=783144296977"
+ticket_url = "https://detail.damai.cn/item.htm?spm=a2oeg.home.card_0.ditem_2.591b23e15Hyzkn&id=769790806798"
 
 class Concert:
     def __init__(self):
@@ -56,31 +56,41 @@ class Concert:
         if self.state == 2:
             print('=' * 30)
             print()
-            while self.browser.title.find('确认订单') == -1:
-                buybutton = self.browser.find_element(By.CLASS_NAME,'skuname').text
-                if buybutton == '看台380元 可预约':
-                    self.browser.refresh()
-                    print("CODE1")
-                elif buybutton == '看台680元 可预约':
-                    self.browser.find_element(By.CLASS_NAME, 'skuname').click()
-                    print("CODE2")
-                elif buybutton == '看台880元 可预约':
-                    self.browser.find_element(By.CLASS_NAME, 'skuname').click()
-                    self.state = 4
-                    print("CODE3")
-                else:
-                    self.state = 100
-                    print(self.state)
-                    print(buybutton)
-                title = self.browser.title
-                if title == '选择座位':
-                    pass
-                elif title == '确认购买':
-                    # 实现下单的操作
-                    while True:
-                        print("正在加载")
-                        self.check_order()
-                        break
+
+            # while self.browser.title.find('确认订单') == -1:
+            #     buybutton = self.browser.find_element(By.CLASS_NAME,'skuname').text
+            #     if buybutton == '看台380元 可预约':
+            #         self.browser.refresh()
+            #         print("CODE1")
+            #     elif buybutton == '看台680元 可预约':
+            #         self.browser.find_element(By.CLASS_NAME, 'skuname').click()
+            #         print("CODE2")
+            #     elif buybutton == '看台880元 可预约':
+            #         self.browser.find_element(By.CLASS_NAME, 'skuname').click()
+            #         self.state = 4
+            #         print("CODE3")
+            #     else:
+            #         self.state = 100
+            #         print(self.state)
+            #         print(buybutton)
+
+            buybutton = self.browser.find_element(By.XPATH,value="//div[contains(text(),'看台980元')]")
+            self.browser.execute_script("arguments[0].click();", buybutton)
+            print("成功点击1")
+            
+            buybutton_Forsh = self.browser.find_element(By.XPATH,value="//div[contains(text(), '不，立即预订')]")
+            self.browser.execute_script("arguments[0].click();", buybutton_Forsh)
+            print("成功点击2")
+            
+            title = self.browser.title
+            if title == '选择座位':
+                pass
+            elif title == '确认购买':
+                # 实现下单的操作
+                while True:
+                    print("正在加载")
+                    self.check_order()
+                    break
 
     def check_order(self):
         print('开始确认订单')
