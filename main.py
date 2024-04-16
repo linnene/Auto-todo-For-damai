@@ -3,7 +3,7 @@ import time
 import pickle
 import os
 from selenium.webdriver.common.by import By
-from .config import settings
+from config import settings
 
 class Concert:
     def __init__(self):
@@ -51,13 +51,14 @@ class Concert:
     # TODO:选择和下单，根据页面以及需求的不同，需要改变
     def choose_ticket(self):
         if self.state == 2:
-            self.state()
-
+            self.states()
 #---------------------------------------------票种修改处
             buybutton = self.browser.find_element(By.XPATH,value="//div[contains(text(),'看台980元')]") #根据选择的按钮文本检索。
             self.browser.execute_script("arguments[0].click();", buybutton)
             Log("成功点击1")
 #---------------------------------------------
+
+            time.sleep(1)
             buybutton_Forsh = self.browser.find_element(By.XPATH,value="//div[contains(text(), '不，立即预订')]")#选择后，有可能出现这一按钮。
             self.browser.execute_script("arguments[0].click();", buybutton_Forsh)
             Log("成功点击2")
@@ -65,7 +66,7 @@ class Concert:
             title = self.browser.title
             if title == '选择座位': #根据点击订单之后，跳转出的页面title的key值
                 print("你有5秒时间选择你的座位")
-                time.sleep(5)
+                time.sleep(5.0)
                 self.state()
                 pass
             elif title == '确认购买':
@@ -74,20 +75,21 @@ class Concert:
                     self.check_order()
                     break
 
-    def state(self) -> None:
+    def states(self) -> None:
         print('-' * 30)
         print()
 
 
     def check_order(self):
         print('开始确认订单')
+        time.sleep(2)
         try:
             self.browser.find_element(by=By.XPATH, value = '//*[@id="container"]/div/div[2]/div[2]/div[1]/div/label').click()
         except Exception as e:
             print("###购票人信息选中失败，自行查看元素位置###")    #购票人需要为首选人
             print(e)
         time.sleep(0.5)
-        self.browser.find_element(by=By.XPATH, value= '//*[@id="container"]/div/div[9]/button').click()
+        self.browser.find_element(by=By.XPATH, value= "//span[contains(text(),'提交订单')]").click()
 
 def Log(get_inp):
     print("Log_out:"+str(get_inp))
@@ -97,5 +99,7 @@ def Log(get_inp):
 if __name__ == '__main__':
     con = Concert()
     con.log_in()
+    time.sleep(1)
     con.enter_contert()
+    time.sleep(1)
     con.check_order()
