@@ -7,10 +7,8 @@ settings = Settings
 
 
 
-
-
 """
-在这个文件中，配置你的抢票页面
+在这个文件中，配置你的抢票页面url：ticket_url
 login_url和damai_url是抢票以及登陆的页面url
 后续的更改以及个性化扩展。
 """
