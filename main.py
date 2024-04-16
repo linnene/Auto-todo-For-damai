@@ -3,10 +3,7 @@ import time
 import pickle
 import os
 from selenium.webdriver.common.by import By
-
-login_url = "https://passport.damai.cn/login?ru=https%3A%2F%2Fwww.damai.cn%2F"
-damai_url = "https://www.damai.cn/"
-ticket_url = "https://detail.damai.cn/item.htm?spm=a2oeg.home.card_0.ditem_2.591b23e15Hyzkn&id=769790806798"
+from .config import settings
 
 class Concert:
     def __init__(self):
@@ -15,14 +12,14 @@ class Concert:
         self.browser = webdriver.Edge()
 
     def set_cookies(self):
-        self.browser.get(login_url)
-        print("### 请扫码登陆 ###")
+        self.browser.get(settings.login_url)
+        print("### 当前没有生成你的cookie_需要手动登陆 ###")
         time.sleep(25)
-        print('登陆成功')
+        print('Loading Success')
         # cookie.pkl
         pickle.dump(self.browser.get_cookies(), open('cookie.pkl', 'wb'))
-        print('cookie保存成功')
-        self.browser.get(ticket_url)
+        print('cookie Save Success')
+        self.browser.get(settings.ticket_url)
 
     def get_cookie(self):
         cookies = pickle.load(open('cookie.pkl', 'rb'))
@@ -34,73 +31,67 @@ class Concert:
     # TODO:登录
     def log_in(self):
         if self.log_method == 0:
-            self.browser.get(login_url)
+            self.browser.get(settings.login_url)
         elif self.log_method == 1:
             if not os.path.exists('cookie.pkl'):
                 self.set_cookies()
             else:
-                self.browser.get(ticket_url)
+                self.browser.get(settings.ticket_url)
                 self.get_cookie()
 
-    """打开浏览器"""
+    """OpenEdge浏览器"""
     def enter_contert(self):
-        print("进入大麦网")
+        Log("being daimai.com")
         self.log_in()
         self.browser.refresh()
         self.state = 2
-        print('登陆成功')
+        print('Loading success')
         self.choose_ticket()
 
-    # TODO:选票和下单
+    # TODO:选择和下单，根据页面以及需求的不同，需要改变
     def choose_ticket(self):
         if self.state == 2:
-            print('=' * 30)
-            print()
+            self.state()
 
-            # while self.browser.title.find('确认订单') == -1:
-            #     buybutton = self.browser.find_element(By.CLASS_NAME,'skuname').text
-            #     if buybutton == '看台380元 可预约':
-            #         self.browser.refresh()
-            #         print("CODE1")
-            #     elif buybutton == '看台680元 可预约':
-            #         self.browser.find_element(By.CLASS_NAME, 'skuname').click()
-            #         print("CODE2")
-            #     elif buybutton == '看台880元 可预约':
-            #         self.browser.find_element(By.CLASS_NAME, 'skuname').click()
-            #         self.state = 4
-            #         print("CODE3")
-            #     else:
-            #         self.state = 100
-            #         print(self.state)
-            #         print(buybutton)
-
-            buybutton = self.browser.find_element(By.XPATH,value="//div[contains(text(),'看台980元')]")
+#---------------------------------------------票种修改处
+            buybutton = self.browser.find_element(By.XPATH,value="//div[contains(text(),'看台980元')]") #根据选择的按钮文本检索。
             self.browser.execute_script("arguments[0].click();", buybutton)
-            print("成功点击1")
-            
-            buybutton_Forsh = self.browser.find_element(By.XPATH,value="//div[contains(text(), '不，立即预订')]")
+            Log("成功点击1")
+#---------------------------------------------
+            buybutton_Forsh = self.browser.find_element(By.XPATH,value="//div[contains(text(), '不，立即预订')]")#选择后，有可能出现这一按钮。
             self.browser.execute_script("arguments[0].click();", buybutton_Forsh)
-            print("成功点击2")
+            Log("成功点击2")
             
             title = self.browser.title
-            if title == '选择座位':
+            if title == '选择座位': #根据点击订单之后，跳转出的页面title的key值
+                print("你有5秒时间选择你的座位")
+                time.sleep(5)
+                self.state()
                 pass
             elif title == '确认购买':
-                # 实现下单的操作
                 while True:
-                    print("正在加载")
+                    Log("loading")
                     self.check_order()
                     break
+
+    def state(self) -> None:
+        print('-' * 30)
+        print()
+
 
     def check_order(self):
         print('开始确认订单')
         try:
             self.browser.find_element(by=By.XPATH, value = '//*[@id="container"]/div/div[2]/div[2]/div[1]/div/label').click()
         except Exception as e:
-            print("###购票人信息选中失败，自行查看元素位置###")    #首选人
+            print("###购票人信息选中失败，自行查看元素位置###")    #购票人需要为首选人
             print(e)
         time.sleep(0.5)
         self.browser.find_element(by=By.XPATH, value= '//*[@id="container"]/div/div[9]/button').click()
+
+def Log(get_inp):
+    print("Log_out:"+str(get_inp))
+
 
 
 if __name__ == '__main__':
@@ -108,4 +99,3 @@ if __name__ == '__main__':
     con.log_in()
     con.enter_contert()
     con.check_order()
-
