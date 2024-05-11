@@ -64,7 +64,7 @@ class Concert:
             Log("成功点击2")
             
             title = self.browser.title
-            if title == '选择座位': #根据点击订单之后，跳转出的页面title的key值
+            if title == '选择座位':                     #根据点击订单之后，跳转出的页面title的key值
                 print("你有5秒时间选择你的座位")
                 time.sleep(5.0)
                 self.state()
